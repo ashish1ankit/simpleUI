@@ -49,7 +49,7 @@ const data=fs.readFileSync('./dev-data/data.json','utf-8');
 const sluges=dataObj.map(el=>slugify(el.productName,{lower:true}));//creating a loist oif sluges
 
 
-// console.log(sluges);
+
 
 
 const server=http.createServer((req,res)=>{//req and response in callback funcation

@@ -1,11 +1,14 @@
 const fs=require('fs');
 const http=require('http');//give networkig capabilities
 const url = require('url');
+const slugify=require('slugify');//change anme oif end of url
+
+
+
 const replaceTemplate=require('./modules/replaceTemplate');
 
 ////////////////////////////////////////////
 ///Files
-
 
 // const read=fs.readFileSync('./file.txt','utf-8');
 // const readFile=fs.readFile('./file.txt','utf-8',(err,data)=>{
@@ -43,7 +46,10 @@ const tempProduct=fs.readFileSync('./templates/template-product.html','utf-8');
 const data=fs.readFileSync('./dev-data/data.json','utf-8');
     const dataObj= JSON.parse(data);//data object is array of objects
 
+const sluges=dataObj.map(el=>slugify(el.productName,{lower:true}));//creating a loist oif sluges
 
+
+// console.log(sluges);
 
 
 const server=http.createServer((req,res)=>{//req and response in callback funcation
@@ -51,8 +57,11 @@ const server=http.createServer((req,res)=>{//req and response in callback funcat
     // console.log(url.parse(req.url,true));//parsing the proudct?id=0 parts from the url when its true
     const {query,pathname}= url.parse(req.url,true);
     // const pathName=req.url;
+// console.log(query);
+// console.log(pathname.split("/")[2]);
 
-
+const serverSlug=pathname.split("/")[2];
+// console.log(sluges.includes(serverSLug));
     //overview page
     if(pathname==='/overview'||pathname==='/'){
         res.writeHead(200,{'Content-type': 'text/html'});
@@ -68,10 +77,11 @@ const server=http.createServer((req,res)=>{//req and response in callback funcat
 
 
         //product page
-    }else if(pathname=='/product'){
+    }else if(sluges.includes(serverSlug)){
         // console.log(query);
         res.writeHead(200,{'Content-type': 'text/html'});
-        const product=dataObj[query.id];
+        const product=dataObj.find(data=>data.slugName===serverSlug);
+        // console.log(product);
         const output=replaceTemplate(tempProduct,product);
         res.end(output);
 
